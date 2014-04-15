@@ -50,20 +50,20 @@ d3.csv(sentenceInfoFileName,
     // The center point
     var snapGridCenter = Math.floor(snapGrid.length/2)+1;
     snapGrid[snapGridCenter][snapGridCenter] = 1;
-    //var snapAxis = d3.scale
-    //                 .linear()
-    //                 .domain([0, d3.max[data, 
-    //                   function(d){
-    //                     return d.rank;
-    //                   }]])
-    //                 .range([0, snapGrid.length/2])
-    //                 ;
+    var snapAxis = d3.scale
+                     .linear()
+                     .domain([0, d3.max(data, 
+                       function(d){
+                         return parseInt(d.rank);
+                       })])
+                     .range([0, (snapGrid.length/2)-1])
+                     ;
     function getCoords(r, th) {
       // The hard coded 40 neeeds to be pulled out
       var origth = th;
       for (var i = 0; i<50; i++) {
-        var ax = Math.round((r) * Math.cos((th)));
-        var ay = Math.round((r) * Math.sin((th)));
+        var ax = Math.round(snapAxis(r) * Math.cos((th)));
+        var ay = Math.round(snapAxis(r) * Math.sin((th)));
         if (!snapGrid[ax+snapGridCenter][ay+snapGridCenter]) {
           snapGrid[ax+snapGridCenter][ay+snapGridCenter] = 1;
           return {"x": ax,
