@@ -3,6 +3,7 @@
 var master = {width: 1000,
               height: 800,
               square: 10,
+              squareGap: 2,
               squareRad: 3,
               ringWidth: 1,
              };
@@ -36,6 +37,50 @@ var sentenceInfoFileName = "data/exampleSentenceData.csv";
 d3.csv(sentenceInfoFileName,
 
   function(data){
+
+    // We need to have a way to snap everything to a grid.
+    var snapGrid = [];
+    for (var i = 0; i < master.height/(master.square+master.squareGap) ; i++ ) {
+      var tmp = [];
+      for (var j = 0; j < master.height/(master.square+master.squareGap) ; j++ ) {
+        tmp[j] = 0;
+      }
+      snapGrid[i] = tmp;
+    }
+    // The center point
+    var snapGridCenter = Math.floor(snapGrid.length/2)+1;
+    snapGrid[snapGridCenter][snapGridCenter] = 1;
+    //var snapAxis = d3.scale
+    //                 .linear()
+    //                 .domain([0, d3.max[data, 
+    //                   function(d){
+    //                     return d.rank;
+    //                   }]])
+    //                 .range([0, snapGrid.length/2])
+    //                 ;
+    function getCoords(r, th) {
+      // The hard coded 40 neeeds to be pulled out
+      var origth = th;
+      for (var i = 0; i<50; i++) {
+        var ax = Math.round((r) * Math.cos((th)));
+        var ay = Math.round((r) * Math.sin((th)));
+        if (!snapGrid[ax+snapGridCenter][ay+snapGridCenter]) {
+          snapGrid[ax+snapGridCenter][ay+snapGridCenter] = 1;
+          return {"x": ax,
+                  "y": ay,
+                 };
+        }
+        th += 10;
+        if (th%360 == origth%360) {
+          r += 10;
+        }
+      }
+      return {"x": 0,
+              "y": 0,
+             };
+    }
+
+
     // Circular axis
     var circAxis = d3.scale
                      .linear()
@@ -74,6 +119,12 @@ d3.csv(sentenceInfoFileName,
 
     // -------------------------- Draw Squares ------------------------------ //
 
+    for (i in data) {
+      var coords = getCoords(parseInt(data[i].rank),circAxis(i));
+      data[i].x = coords["x"];
+      data[i].y = coords["y"];
+    }
+
     svg.selectAll(".boxes")
        .data(data)
        .enter()
@@ -85,11 +136,11 @@ d3.csv(sentenceInfoFileName,
        .attr("ry", master.squareRad)
        .attr("x",
           function(d,i) {
-            return (d.rank*40 * Math.cos(circAxis(i)) + master.height/2 );
+            return master.height/2 -master.square/2 + (d.x*(master.square+master.squareGap));
           })
        .attr("y",
           function(d,i) {
-            return (d.rank*40 * Math.sin(circAxis(i)) + master.height/2 );
+            return master.height/2 -master.square/2 + (d.y*(master.square+master.squareGap));
           })
        .style("fill",
           function(d) {
