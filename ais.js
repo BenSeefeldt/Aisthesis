@@ -141,6 +141,19 @@ d3.csv(termInfoFileName,
                  return d.op;
                }
              })
+        svg.selectAll(".words")
+           .style("opacity",
+             function(d){
+               if (this.classList[2] == cat) {
+                 d.op = 0;
+               } 
+               if (active.shape == "boxes") {
+                 return 0;
+               } else{
+                 return d.op;
+               }
+
+             })
         active[cat] = 0;
         uibox.style.fill = colors.dark[cat];
       } else if (active[cat] == 0){
@@ -152,6 +165,18 @@ d3.csv(termInfoFileName,
                  return 1;
                } 
                else {
+                 return d.op;
+               }
+             })
+        svg.selectAll(".words")
+           .style("opacity",
+             function(d){
+               if (this.classList[2] == cat) {
+                 d.op = 1;
+               } 
+               if (active.shape == "boxes") {
+                 return 0;
+               } else{
                  return d.op;
                }
              })
@@ -223,7 +248,8 @@ d3.csv(termInfoFileName,
       .append("text")
       .attr("class",
         function(d){
-         return "words holder "+d.type;
+          d.op = 1;
+          return "words holder "+d.type;
         })
       .text(
         function(d) {
@@ -316,7 +342,10 @@ d3.csv(termInfoFileName,
                 .duration(800)
                 .attr("x", master.height/2 - master.square/2)
                 .attr("y", master.height/2 - master.square/2)
-                .style("opacity","0")
+                .style("opacity",
+                  function(){
+                    return "0";
+                  })
                 ;
              svg.selectAll(".words")
                 .transition()
@@ -329,7 +358,10 @@ d3.csv(termInfoFileName,
                   function(d,i){
                     return (termAxis(d.rank) * Math.sin(i)) + master.height/2;
                   })
-                .style("opacity","1")
+                .style("opacity",
+                  function(d){
+                    return d.op == 0 ? 0.0 : 1.0;
+                  })
                 ;
              active.shape = "terms";
            }
@@ -345,7 +377,10 @@ d3.csv(termInfoFileName,
                   function(d,i) {
                     return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
                   })
-                .style("opacity","1")
+                .style("opacity",
+                  function(d){
+                    return d.op == 0 ? 0.0 : 1.0;
+                  })
                 ;
              svg.selectAll(".words")
                 .transition()
