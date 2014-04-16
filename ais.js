@@ -6,6 +6,7 @@ var master = {width: 1000,
               squareGap: 4,
               squareRad: 3,
               ringWidth: 1,
+              toolRad: 5,
              };
 
 var colors = {red: "#d11c24",
@@ -37,13 +38,15 @@ var sentenceInfoFileName = "data/exampleSentenceData.csv";
 d3.csv(sentenceInfoFileName,
 
   function(data){
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-5, 5])
-  .direction("ne")
-  .html(function(d) {
-    return d.sent;
-  });
+    var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([master.toolRad, master.toolRad])
+                .direction("se")
+                .html(
+                  function(d) {
+                    return d.sent;
+                })
+                ;
 
     // We need to have a way to snap everything to a grid.
     var snapGrid = [];
@@ -99,16 +102,6 @@ var tip = d3.tip()
     document.body.style.backgroundColor = colors.background;
 
 
-    // Center point
-    svg.append("rect")
-       .attr("width", master.square)
-       .attr("height", master.square)
-       .attr("rx", master.squareRad)
-       .attr("ry", master.squareRad)
-       .attr("x", master.height/2 - master.square/2)
-       .attr("y", master.height/2 - master.square/2)
-       .style("fill", colors.white)
-       ;
 
     // Rings
     svg.selectAll(".rings")
@@ -175,6 +168,27 @@ var tip = d3.tip()
            svg.selectAll(".boxes")
              .style("opacity",1.0)
            ;
+         })
+       ;
+
+    // Center point
+    svg.append("rect")
+       .attr("width", master.square)
+       .attr("height", master.square)
+       .attr("rx", master.squareRad)
+       .attr("ry", master.squareRad)
+       .attr("x", master.height/2 - master.square/2)
+       .attr("y", master.height/2 - master.square/2)
+       .style("fill", colors.white)
+       .on("click",
+         function() {
+           svg.selectAll(".boxes")
+              .transition()
+              .duration(800)
+              .attr("x", master.height/2 - master.square/2)
+              .attr("y", master.height/2 - master.square/2)
+              .style("opacity","0")
+              ;
          })
        ;
 
