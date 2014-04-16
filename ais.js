@@ -2,12 +2,12 @@
 // room for interaction tools.
 var master = {width: 900,
               height: 800,
-              square: 10,
-              squareGap: 1,
-              squareRad: 0,
+              square: 15,
+              squareGap: 3,
+              squareRad: 3,
               ringWidth: 1,
               toolRad: 5,
-              fontsize: 20,
+              fontsize: 10,
               uibox: 80,
               uiboxRad: 10,
               uiboxGap: 10,
@@ -49,7 +49,7 @@ var svg = d3.select("body")
 
 //var sentenceInfoFileName = "data/exampleSentenceData.csv";
 var sentenceInfoFileName = "data/draft1SentenceData.csv";
-var termInfoFileName = "data/exampleTermData.csv";
+var termInfoFileName = "data/draft1TermData.csv";
 
 d3.csv(sentenceInfoFileName,
   function(data){
@@ -87,11 +87,11 @@ d3.csv(termInfoFileName,
     snapGrid[snapGridCenter][snapGridCenter] = 1;
     var snapAxis = d3.scale
                      .linear()
-                     .domain([1, d3.max(data,
+                     .domain([0, d3.max(data,
                        function(d){
                          return parseInt(d.rank);
                        })])
-                     .range([1, (snapGrid.length/2)-1])
+                     .range([0, (snapGrid.length/2)-1])
                      ;
     function checkCoords(x,y) {
       if (x+snapGridCenter < 0 || y+snapGridCenter < 0 ||  x+snapGridCenter > snapGrid.length || y+snapGridCenter > snapGrid.length){
@@ -365,6 +365,8 @@ d3.csv(termInfoFileName,
            tip.show(d);
            var boxMouse = this;
            svg.selectAll(".boxes")
+             .transition()
+             .duration(200)
              .style("opacity",
                function(d){
                  return d.op == 0 ? 0.0 : (this.classList[1]==boxMouse.classList[1]) ? 1.0 : (0.2);
@@ -376,6 +378,8 @@ d3.csv(termInfoFileName,
            var boxMouse = this;
            tip.hide(d);
            svg.selectAll(".boxes")
+             .transition()
+             .duration(200)
              .style("opacity",
                function(d){
                  return 1 & d.op;
