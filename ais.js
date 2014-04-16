@@ -91,7 +91,7 @@ d3.csv(termInfoFileName,
                        function(d){
                          return parseInt(d.rank);
                        })])
-                     .range([0, (snapGrid.length/2)-1])
+                     .range([1, (snapGrid.length/2)-1])
                      ;
     function checkCoords(x,y) {
       if (x+snapGridCenter < 0 || y+snapGridCenter < 0 ||  x+snapGridCenter > snapGrid.length || y+snapGridCenter > snapGrid.length){
@@ -416,11 +416,11 @@ d3.csv(termInfoFileName,
                 .duration(800)
                 .attr("x",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.cos(d.cluster)) + master.height/2;
+                    return (termAxis(d.rank) * Math.cos(circAxis(d.cluster))) + master.height/2;
                   })
                 .attr("y",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.sin(d.cluster)) + master.height/2;
+                    return (termAxis(d.rank) * Math.sin(circAxis(d.cluster))) + master.height/2;
                   })
                 .style("opacity",
                   function(d){
