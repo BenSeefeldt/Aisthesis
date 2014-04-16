@@ -2,8 +2,8 @@
 // room for interaction tools.
 var master = {width: 1000,
               height: 800,
-              square: 10,
-              squareGap: 2,
+              square: 15,
+              squareGap: 4,
               squareRad: 3,
               ringWidth: 1,
              };
@@ -37,6 +37,13 @@ var sentenceInfoFileName = "data/exampleSentenceData.csv";
 d3.csv(sentenceInfoFileName,
 
   function(data){
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-5, 5])
+  .direction("ne")
+  .html(function(d) {
+    return d.sent;
+  });
 
     // We need to have a way to snap everything to a grid.
     var snapGrid = [];
@@ -72,7 +79,7 @@ d3.csv(sentenceInfoFileName,
         }
         th += 10;
         if (th%360 == origth%360) {
-          r += 10;
+          r -= 10;
         }
       }
       return {"x": 0,
@@ -125,27 +132,50 @@ d3.csv(sentenceInfoFileName,
       data[i].y = coords["y"];
     }
 
+    svg.call(tip);
     svg.selectAll(".boxes")
        .data(data)
        .enter()
        .append("rect")
-       .attr("class", "boxes")
+       .attr("class",
+         function(d,i) {
+           return "boxes "+d.num;
+         })
        .attr("width", master.square)
        .attr("height", master.square)
        .attr("rx", master.squareRad)
        .attr("ry", master.squareRad)
        .attr("x",
-          function(d,i) {
-            return master.height/2 -master.square/2 + (d.x*(master.square+master.squareGap));
-          })
+         function(d,i) {
+           return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+         })
        .attr("y",
-          function(d,i) {
-            return master.height/2 -master.square/2 + (d.y*(master.square+master.squareGap));
-          })
+         function(d,i) {
+           return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+         })
        .style("fill",
-          function(d) {
-            return colorMap[d.type];
-          })
+         function(d) {
+           return colorMap[d.type];
+         })
+       .style("opacity", 1.0)
+       .on("mouseover",
+         function(d,i) {
+           tip.show(d);
+           var boxMouse = this;
+           svg.selectAll(".boxes")
+             .style("opacity",
+               function(){
+                 return (this.classList[1]==boxMouse.classList[1]) ? 1.0 : 0.2;
+               })
+         })
+       .on("mouseout",
+         function(d,i) {
+           var boxMouse = this;
+           tip.hide(d);
+           svg.selectAll(".boxes")
+             .style("opacity",1.0)
+           ;
+         })
        ;
 
   }

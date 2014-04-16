@@ -1,2 +1,13 @@
 body {
+  font-family: Inder;
+  color: rgb(253,246,227);
 }
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(147, 161, 161, 0.8);
+  color: #fff;
+  border-radius: 5px;
+}
+
