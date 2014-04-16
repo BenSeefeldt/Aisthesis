@@ -76,18 +76,18 @@ d3.csv(termInfoFileName,
       snapGrid[i] = tmp;
     }
     var termAxis = d3.scale
-                     .linear()
-                     .domain([0, d3.max(termData,
+                     .log()
+                     .domain([1, d3.max(termData,
                        function(d){
                          return parseInt(d.rank);
                        })])
-                     .range([0, Math.floor(master.height/2)])
+                     .range([20, Math.floor(master.height/2)])
                      ;
     var snapGridCenter = Math.floor(snapGrid.length/2)+1;
     snapGrid[snapGridCenter][snapGridCenter] = 1;
     var snapAxis = d3.scale
-                     .linear()
-                     .domain([0, d3.max(data,
+                     .log()
+                     .domain([1, d3.max(data,
                        function(d){
                          return parseInt(d.rank);
                        })])
@@ -416,11 +416,11 @@ d3.csv(termInfoFileName,
                 .duration(800)
                 .attr("x",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.cos(i)) + master.height/2;
+                    return (termAxis(d.rank) * Math.cos(d.cluster)) + master.height/2;
                   })
                 .attr("y",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.sin(i)) + master.height/2;
+                    return (termAxis(d.rank) * Math.sin(d.cluster)) + master.height/2;
                   })
                 .style("opacity",
                   function(d){
