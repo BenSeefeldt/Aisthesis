@@ -7,6 +7,7 @@ var master = {width: 1000,
               squareRad: 3,
               ringWidth: 1,
               toolRad: 5,
+              fontsize: 20,
              };
 
 var colors = {red: "#d11c24",
@@ -24,6 +25,10 @@ var colorMap = {"l":colors.green,
 
 var ringWidth = [100, 200, 300, 398];
 
+var active = {shape: "boxes",
+              type: "all",
+              };
+
 // Create main svg chart.
 var svg = d3.select("body")
             .append("svg")
@@ -34,10 +39,13 @@ var svg = d3.select("body")
             ;
 
 var sentenceInfoFileName = "data/exampleSentenceData.csv";
+var termInfoFileName = "data/exampleTermData.csv";
 
 d3.csv(sentenceInfoFileName,
-
   function(data){
+d3.csv(termInfoFileName,
+  function(termData){
+
     var tip = d3.tip()
                 .attr('class', 'd3-tip')
                 .offset([master.toolRad, master.toolRad])
@@ -57,12 +65,19 @@ d3.csv(sentenceInfoFileName,
       }
       snapGrid[i] = tmp;
     }
-    // The center point
+    var termAxis = d3.scale
+                     .linear()
+                     .domain([0, d3.max(termData,
+                       function(d){
+                         return parseInt(d.rank);
+                       })])
+                     .range([0, Math.floor(master.height/2)])
+                     ;
     var snapGridCenter = Math.floor(snapGrid.length/2)+1;
     snapGrid[snapGridCenter][snapGridCenter] = 1;
     var snapAxis = d3.scale
                      .linear()
-                     .domain([0, d3.max(data, 
+                     .domain([0, d3.max(data,
                        function(d){
                          return parseInt(d.rank);
                        })])
@@ -120,6 +135,23 @@ d3.csv(sentenceInfoFileName,
        .style("fill", "none")
        ;
 
+    // --------------------------- Draw Words ------------------------------- //
+
+    svg.selectAll(".words")
+      .data(termData)
+      .enter()
+      .append("text")
+      .attr("class","words")
+      .text(
+        function(d) {
+          return d.word;
+        })
+      .attr("font-size", master.fontsize)
+      .attr("fill", colors.white)
+      .attr("x",master.height/2 - master.square/2)
+      .attr("y",master.height/2 - master.square/2)
+      .style("opacity",0.0)
+      ;
     // -------------------------- Draw Squares ------------------------------ //
 
     for (i in data) {
@@ -185,16 +217,60 @@ d3.csv(sentenceInfoFileName,
        .style("fill", colors.white)
        .on("click",
          function() {
-           svg.selectAll(".boxes")
-              .transition()
-              .duration(800)
-              .attr("x", master.height/2 - master.square/2)
-              .attr("y", master.height/2 - master.square/2)
-              .style("opacity","0")
-              ;
+           if (active.shape == "boxes"){
+             svg.selectAll(".boxes")
+                .transition()
+                .duration(800)
+                .attr("x", master.height/2 - master.square/2)
+                .attr("y", master.height/2 - master.square/2)
+                .style("opacity","0")
+                ;
+             svg.selectAll(".words")
+                .transition()
+                .duration(800)
+                .attr("x",
+                  function(d,i){
+                    return (termAxis(d.rank) * Math.cos(i)) + master.height/2;
+                  })
+                .attr("y",
+                  function(d,i){
+                    return (termAxis(d.rank) * Math.sin(i)) + master.height/2;
+                  })
+                .style("opacity","1")
+                ;
+             active.shape = "terms";
+           }
+           else if (active.shape == "terms"){
+             svg.selectAll(".boxes")
+                .transition()
+                .duration(800)
+                .attr("x",
+                  function(d,i) {
+                    return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+                  })
+                .attr("y",
+                  function(d,i) {
+                    return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+                  })
+                .style("opacity","1")
+                ;
+             svg.selectAll(".words")
+                .transition()
+                .duration(800)
+                .attr("x",master.height/2 - master.square/2)
+                .attr("y",master.height/2 - master.square/2)
+                .style("opacity","0")
+                ;
+             active.shape = "boxes";
+           }
          })
        ;
 
+// Close term data
+  }
+
+);
+// Close sentence data
   }
 
 );

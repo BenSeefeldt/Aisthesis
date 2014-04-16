@@ -1,0 +1,15 @@
+word,rank,cluster,type
+happy,1,,l
+calm,3,,l
+weird,4,,l
+nice,2,,l
+particular,5,,l
+friendly,7,,d
+quiet,8,,d
+different,9,,d
+random,4,,d
+wild,5,,d
+mean,6,,u
+horribly,4,,u
+difficult,7,,u
+patriotic,8,,u
