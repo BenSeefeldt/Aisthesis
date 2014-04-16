@@ -2,9 +2,9 @@
 // room for interaction tools.
 var master = {width: 900,
               height: 800,
-              square: 15,
-              squareGap: 4,
-              squareRad: 3,
+              square: 10,
+              squareGap: 1,
+              squareRad: 0,
               ringWidth: 1,
               toolRad: 5,
               fontsize: 20,
@@ -47,7 +47,8 @@ var svg = d3.select("body")
             .append("g")
             ;
 
-var sentenceInfoFileName = "data/exampleSentenceData.csv";
+//var sentenceInfoFileName = "data/exampleSentenceData.csv";
+var sentenceInfoFileName = "data/draft1SentenceData.csv";
 var termInfoFileName = "data/exampleTermData.csv";
 
 d3.csv(sentenceInfoFileName,
@@ -86,34 +87,92 @@ d3.csv(termInfoFileName,
     snapGrid[snapGridCenter][snapGridCenter] = 1;
     var snapAxis = d3.scale
                      .linear()
-                     .domain([0, d3.max(data,
+                     .domain([1, d3.max(data,
                        function(d){
                          return parseInt(d.rank);
                        })])
-                     .range([0, (snapGrid.length/2)-1])
+                     .range([1, (snapGrid.length/2)-1])
                      ;
+    function checkCoords(x,y) {
+      if (x+snapGridCenter < 0 || y+snapGridCenter < 0 ||  x+snapGridCenter > snapGrid.length || y+snapGridCenter > snapGrid.length){
+        return false;
+      }
+      if (snapGrid[x+snapGridCenter][y+snapGridCenter] == 1) {
+        return false;
+      }
+      return true;
+    }
     function getCoords(r, th) {
-      // The hard coded 40 neeeds to be pulled out
-      var origth = th;
-      for (var i = 0; i<50; i++) {
-        var ax = Math.round(snapAxis(r) * Math.cos((th)));
-        var ay = Math.round(snapAxis(r) * Math.sin((th)));
-        if (!snapGrid[ax+snapGridCenter][ay+snapGridCenter]) {
-          snapGrid[ax+snapGridCenter][ay+snapGridCenter] = 1;
-          return {"x": ax,
+      var wth = th;
+      var wr = r;
+      var ax = Math.round(snapAxis(wr+1) * Math.cos((wth)));
+      var ay = Math.round(snapAxis(wr+1) * Math.sin((wth)));
+      if (checkCoords(ax,ay)) {
+        snapGrid[ax+snapGridCenter][ay+snapGridCenter] = 1;
+        return {"x": ax,
+                "y": ay,
+               };
+      }
+      // If ax,ay is filled, we need to find the next best thing.
+      // We're going to be cycling around it.
+      for (var i=0; i<5000; i++){
+        // Just check each of the eight directions, it won't get things not on
+        // +/- 1 slope, but whatever.
+        if (checkCoords(ax+i,ay)){
+          snapGrid[ax+i+snapGridCenter][ay+snapGridCenter] = 1;
+          return {"x": ax+i,
                   "y": ay,
                  };
         }
-        th += 10;
-        if (th%360 == origth%360) {
-          r -= 10;
+
+        if (checkCoords(ax+i,ay+i)){
+          snapGrid[ax+i+snapGridCenter][ay+i+snapGridCenter] = 1;
+          return {"x": ax+i,
+                  "y": ay+i,
+                 };
+        }
+        if (checkCoords(ax,ay+i)){
+          snapGrid[ax+snapGridCenter][ay+i+snapGridCenter] = 1;
+          return {"x": ax,
+                  "y": ay+i,
+                 };
+        }
+        if (checkCoords(ax-i,ay)){
+          snapGrid[ax-i+snapGridCenter][ay+snapGridCenter] = 1;
+          return {"x": ax-i,
+                  "y": ay,
+                 };
+        }
+        if (checkCoords(ax-i,ay-i)){
+          snapGrid[ax-i+snapGridCenter][ay-i+snapGridCenter] = 1;
+          return {"x": ax-i,
+                  "y": ay-i,
+                 };
+        }
+        if (checkCoords(ax,ay-i)){
+          snapGrid[ax+snapGridCenter][ay-i+snapGridCenter] = 1;
+          return {"x": ax,
+                  "y": ay-i,
+                 };
+        }
+        if (checkCoords(ax+i,ay-i)){
+          snapGrid[ax+i+snapGridCenter][ay-i+snapGridCenter] = 1;
+          return {"x": ax+i,
+                  "y": ay-i,
+                 };
         }
       }
-      return {"x": 0,
-              "y": 0,
+        if (checkCoords(ax-i,ay+i)){
+          snapGrid[ax-i+snapGridCenter][ay+i+snapGridCenter] = 1;
+          return {"x": ax-i,
+                  "y": ay+i,
+                 };
+        }
+      return {"x": ax,
+              "y": ay,
              };
-    }
 
+    }
 
     // Circular axis
     var circAxis = d3.scale
@@ -270,6 +329,7 @@ d3.csv(termInfoFileName,
       var coords = getCoords(parseInt(data[i].rank),circAxis(data[i].cluster));
       data[i].x = coords["x"];
       data[i].y = coords["y"];
+      console.log(coords);
       data[i].op = 1;
     }
 
