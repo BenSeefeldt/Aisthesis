@@ -1,6 +1,6 @@
 // The circle part should be a square. The extra 200 pixels are to allow for 
 // room for interaction tools.
-var master = {width: 1000,
+var master = {width: 950,
               height: 800,
               square: 15,
               squareGap: 4,
@@ -8,6 +8,9 @@ var master = {width: 1000,
               ringWidth: 1,
               toolRad: 5,
               fontsize: 20,
+              uibox: 100,
+              uiboxRad: 10,
+              uiboxGap: 10,
              };
 
 var colors = {red: "#d11c24",
@@ -121,6 +124,34 @@ d3.csv(termInfoFileName,
 
 
 
+    // Corner Controls
+    svg.append("rect")
+       .attr("width", master.uibox)
+       .attr("height", master.uibox)
+       .attr("rx", master.uiboxRad)
+       .attr("ry", master.uiboxRad)
+       .style("fill", colors.yellow)
+       .attr("x", master.width-master.uiboxGap-master.uibox)
+       .attr("y", master.uiboxGap)
+       ;
+    svg.append("rect")
+       .attr("width", master.uibox)
+       .attr("height", master.uibox)
+       .attr("rx", master.uiboxRad)
+       .attr("ry", master.uiboxRad)
+       .style("fill", colors.red)
+       .attr("x", master.width-(2*master.uiboxGap)-(2*master.uibox))
+       .attr("y", master.uiboxGap)
+       ;
+    svg.append("rect")
+       .attr("width", master.uibox)
+       .attr("height", master.uibox)
+       .attr("rx", master.uiboxRad)
+       .attr("ry", master.uiboxRad)
+       .style("fill", colors.green)
+       .attr("x", master.width-master.uiboxGap-master.uibox)
+       .attr("y", (2*master.uiboxGap)+master.uibox)
+       ;
     // Rings
     svg.selectAll(".rings")
        .data(ringWidth)
@@ -147,7 +178,10 @@ d3.csv(termInfoFileName,
           return d.word;
         })
       .attr("font-size", master.fontsize)
-      .attr("fill", colors.white)
+      .attr("fill",
+          function(d) {
+            return colorMap[d.type];
+          })
       .attr("x",master.height/2 - master.square/2)
       .attr("y",master.height/2 - master.square/2)
       .style("opacity",0.0)
@@ -167,7 +201,7 @@ d3.csv(termInfoFileName,
        .append("rect")
        .attr("class",
          function(d,i) {
-           return "boxes "+d.num;
+           return "boxes "+d.num +" " +d.type;
          })
        .attr("width", master.square)
        .attr("height", master.square)
