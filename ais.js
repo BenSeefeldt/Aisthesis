@@ -94,7 +94,10 @@ d3.csv(sentenceInfoFileName,
     // Circular axis
     var circAxis = d3.scale
                      .linear()
-                     .domain([0, data.length])
+                     .domain([0, d3.max(data,
+                       function(d) {
+                         return d.cluster
+                       })])
                      .range([0, 360])
                      ;
     // ------------------- Controls and Static Items ------------------------ //
@@ -120,7 +123,7 @@ d3.csv(sentenceInfoFileName,
     // -------------------------- Draw Squares ------------------------------ //
 
     for (i in data) {
-      var coords = getCoords(parseInt(data[i].rank),circAxis(i));
+      var coords = getCoords(parseInt(data[i].rank),circAxis(data[i].cluster));
       data[i].x = coords["x"];
       data[i].y = coords["y"];
     }
