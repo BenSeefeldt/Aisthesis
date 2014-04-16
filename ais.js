@@ -1,6 +1,6 @@
 // The circle part should be a square. The extra 200 pixels are to allow for 
 // room for interaction tools.
-var master = {width: 950,
+var master = {width: 900,
               height: 800,
               square: 15,
               squareGap: 4,
@@ -8,17 +8,22 @@ var master = {width: 950,
               ringWidth: 1,
               toolRad: 5,
               fontsize: 20,
-              uibox: 100,
+              uibox: 80,
               uiboxRad: 10,
               uiboxGap: 10,
              };
 
 var colors = {red: "#d11c24",
               yellow: "#a57706",
+              darkYellow: "#653700",
               green: "#738a05",
               white: "#fcf4dc",
               background: "#0d2c36",
               ring: "#74817d",
+              dark: {"u": "#653700",
+                     "d": "#a10c04",
+                     "l": "#536a00",
+                    },
              };
 
 var colorMap = {"l":colors.green,
@@ -29,9 +34,10 @@ var colorMap = {"l":colors.green,
 var ringWidth = [100, 200, 300, 398];
 
 var active = {shape: "boxes",
-              type: "all",
+              l: 1,
+              d: 1,
+              u: 1,
               };
-
 // Create main svg chart.
 var svg = d3.select("body")
             .append("svg")
@@ -122,6 +128,37 @@ d3.csv(termInfoFileName,
     // Set background
     document.body.style.backgroundColor = colors.background;
 
+    function swapActive(uibox, cat) {
+      if (active[cat] == 1){
+        svg.selectAll(".boxes")
+           .style("opacity",
+             function(d){
+               if (this.classList[2] == cat) {
+                 d.op = 0;
+                 return 0;
+               } 
+               else {
+                 return d.op;
+               }
+             })
+        active[cat] = 0;
+        uibox.style.fill = colors.dark[cat];
+      } else if (active[cat] == 0){
+        svg.selectAll(".boxes")
+           .style("opacity",
+             function(d){
+               if (this.classList[2] == cat) {
+                 d.op = 1;
+                 return 1;
+               } 
+               else {
+                 return d.op;
+               }
+             })
+        active[cat] = 1;
+        uibox.style.fill = colorMap[cat];
+      }
+    }
 
 
     // Corner Controls
@@ -133,6 +170,10 @@ d3.csv(termInfoFileName,
        .style("fill", colors.yellow)
        .attr("x", master.width-master.uiboxGap-master.uibox)
        .attr("y", master.uiboxGap)
+       .on("click",
+         function() {
+           swapActive(this,"u")
+         })
        ;
     svg.append("rect")
        .attr("width", master.uibox)
@@ -142,6 +183,10 @@ d3.csv(termInfoFileName,
        .style("fill", colors.red)
        .attr("x", master.width-(2*master.uiboxGap)-(2*master.uibox))
        .attr("y", master.uiboxGap)
+       .on("click",
+         function() {
+           swapActive(this,"d")
+         })
        ;
     svg.append("rect")
        .attr("width", master.uibox)
@@ -151,6 +196,10 @@ d3.csv(termInfoFileName,
        .style("fill", colors.green)
        .attr("x", master.width-master.uiboxGap-master.uibox)
        .attr("y", (2*master.uiboxGap)+master.uibox)
+       .on("click",
+         function() {
+           swapActive(this,"l")
+         })
        ;
     // Rings
     svg.selectAll(".rings")
@@ -172,7 +221,10 @@ d3.csv(termInfoFileName,
       .data(termData)
       .enter()
       .append("text")
-      .attr("class","words")
+      .attr("class",
+        function(d){
+         return "words holder "+d.type;
+        })
       .text(
         function(d) {
           return d.word;
@@ -192,6 +244,7 @@ d3.csv(termInfoFileName,
       var coords = getCoords(parseInt(data[i].rank),circAxis(data[i].cluster));
       data[i].x = coords["x"];
       data[i].y = coords["y"];
+      data[i].op = 1;
     }
 
     svg.call(tip);
@@ -222,20 +275,26 @@ d3.csv(termInfoFileName,
        .style("opacity", 1.0)
        .on("mouseover",
          function(d,i) {
+           if (d.op != 0){
            tip.show(d);
            var boxMouse = this;
            svg.selectAll(".boxes")
              .style("opacity",
-               function(){
-                 return (this.classList[1]==boxMouse.classList[1]) ? 1.0 : 0.2;
+               function(d){
+                 return d.op == 0 ? 0.0 : (this.classList[1]==boxMouse.classList[1]) ? 1.0 : (0.2);
                })
+           }
          })
        .on("mouseout",
          function(d,i) {
            var boxMouse = this;
            tip.hide(d);
            svg.selectAll(".boxes")
-             .style("opacity",1.0)
+             .style("opacity",
+               function(d){
+                 return 1 & d.op;
+
+               })
            ;
          })
        ;
