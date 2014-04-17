@@ -2,16 +2,21 @@
 // room for interaction tools.
 var master = {width: 900,
               height: 800,
-              square: 10,
-              squareGap: 3,
+              square: 12,
+              squareGap: 2,
               squareRad: 3,
               ringWidth: 1,
               toolRad: 5,
-              fontsize: 10,
+              fontsize: 12,
               uibox: 80,
               uiboxRad: 10,
               uiboxGap: 10,
+              mineWidth: 2,
              };
+
+var user = {number: 255,
+            clicks: 0,
+           };
 
 var colors = {red: "#d11c24",
               yellow: "#a57706",
@@ -48,7 +53,7 @@ var svg = d3.select("body")
             ;
 
 //var sentenceInfoFileName = "data/exampleSentenceData.csv";
-var sentenceInfoFileName = "data/draft2SentenceData.csv";
+var sentenceInfoFileName = "data/draft3SentenceData.csv";
 var termInfoFileName = "data/draft2TermData.csv";
 
 d3.csv(sentenceInfoFileName,
@@ -77,11 +82,12 @@ d3.csv(termInfoFileName,
     }
     var termAxis = d3.scale
                      .log()
+                     .clamp(true)
                      .domain([1, d3.max(termData,
                        function(d){
-                         return parseInt(d.rank);
+                         return parseInt(d.rank)+1;
                        })])
-                     .range([20, Math.floor(master.height/2)])
+                     .range([10, 400])
                      ;
     var snapGridCenter = Math.floor(snapGrid.length/2)+1;
     snapGrid[snapGridCenter][snapGridCenter] = 1;
@@ -301,9 +307,11 @@ d3.csv(termInfoFileName,
     svg.selectAll(".rings")
        .data(ringWidth)
        .transition()
-       .delay(300)
+       .delay(00)
+       //.delay(300)
        .ease("elastic")
-       .duration(5000)
+       .duration(000)
+       //.duration(3000)
        .attr("r", function(d) { return d; })
 
     // --------------------------- Draw Words ------------------------------- //
@@ -336,7 +344,6 @@ d3.csv(termInfoFileName,
       var coords = getCoords(parseInt(data[i].rank),circAxis(data[i].cluster));
       data[i].x = coords["x"];
       data[i].y = coords["y"];
-      console.log(coords);
       data[i].op = 1;
     }
 
@@ -397,9 +404,11 @@ d3.csv(termInfoFileName,
        ;
     svg.selectAll(".boxes")
        .transition()
-       .delay(300)
+       //.delay(300)
+       .delay(00)
        .ease("elastic")
-       .duration(5000)
+       .duration(000)
+       //.duration(3000)
        .attr("x",
          function(d,i) {
            return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
@@ -431,17 +440,23 @@ d3.csv(termInfoFileName,
                   function(){
                     return "0";
                   })
+                .filter(
+                  function(d,i){
+                    return d.num == user.number ? 1 : 0;
+                  })
+                .style("stroke","#ffffff")
+                .style("stroke-width",master.mineWidth)
                 ;
              svg.selectAll(".words")
                 .transition()
                 .duration(800)
                 .attr("x",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.cos(circAxis(d.cluster))) + master.height/2;
+                    return (termAxis(parseInt(d.rank)+1) * Math.cos(circAxis(d.cluster))) + master.height/2;
                   })
                 .attr("y",
                   function(d,i){
-                    return (termAxis(d.rank) * Math.sin(circAxis(d.cluster))) + master.height/2;
+                    return (termAxis(parseInt(d.rank)+1) * Math.sin(circAxis(d.cluster))) + master.height/2;
                   })
                 .style("opacity",
                   function(d){
