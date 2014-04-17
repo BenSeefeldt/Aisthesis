@@ -304,15 +304,6 @@ d3.csv(termInfoFileName,
        .style("stroke-width", master.ringWidth)
        .style("fill", "none")
        ;
-    svg.selectAll(".rings")
-       .data(ringWidth)
-       .transition()
-       .delay(00)
-       //.delay(300)
-       .ease("elastic")
-       .duration(000)
-       //.duration(3000)
-       .attr("r", function(d) { return d; })
 
     // --------------------------- Draw Words ------------------------------- //
 
@@ -402,22 +393,86 @@ d3.csv(termInfoFileName,
            ;
          })
        ;
-    svg.selectAll(".boxes")
-       .transition()
-       //.delay(300)
-       .delay(00)
-       .ease("elastic")
-       .duration(000)
-       //.duration(3000)
-       .attr("x",
-         function(d,i) {
-           return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
-         })
-       .attr("y",
-         function(d,i) {
-           return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
-         })
-       .style("opacity", 1.0)
+    svg.append("image")
+       .attr("x", 410)
+       .attr("y", 300)
+       .attr("width", 200)
+       .attr("height", 200)
+       .attr("class","preim")
+       .attr("xlink:href","http://localhost:8000/data/sarah.png")
+       .on("click",
+           function(){
+            user.number=252;
+            svg.selectAll(".rings")
+               .data(ringWidth)
+               .transition()
+               .delay(300)
+               .ease("elastic")
+               .duration(3000)
+               .attr("r", function(d) { return d; })
+            svg.selectAll(".boxes")
+               .transition()
+               .delay(300)
+               .ease("elastic")
+               .duration(3000)
+               .attr("x",
+                 function(d,i) {
+                   return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+                 })
+               .attr("y",
+                 function(d,i) {
+                   return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+                 })
+               .style("opacity", 1.0)
+            svg.selectAll(".preim")
+              .transition()
+              .duration(1000)
+              .attr("x", master.height/2 - master.square/2)
+              .attr("y", master.height/2 - master.square/2)
+              .attr("width",0)
+              .attr("height",0)
+
+           });
+    svg.append("image")
+       .attr("class","preim")
+       .attr("x", 200)
+       .attr("y", 300)
+       .attr("width", 200)
+       .attr("height", 200)
+       .attr("xlink:href","http://localhost:8000/data/ben.png")
+       .on("click",
+           function(){
+            user.number=253;
+            svg.selectAll(".rings")
+               .data(ringWidth)
+               .transition()
+               .delay(300)
+               .ease("elastic")
+               .duration(3000)
+               .attr("r", function(d) { return d; })
+            svg.selectAll(".boxes")
+               .transition()
+               .delay(300)
+               .ease("elastic")
+               .duration(3000)
+               .attr("x",
+                 function(d,i) {
+                   return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+                 })
+               .attr("y",
+                 function(d,i) {
+                   return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+                 })
+               .style("opacity", 1.0)
+            svg.selectAll(".preim")
+              .transition()
+              .duration(1000)
+              .attr("x", master.height/2 - master.square/2)
+              .attr("y", master.height/2 - master.square/2)
+              .attr("width",0)
+              .attr("height",0)
+
+           });
 
     // Center point
     svg.append("rect")
