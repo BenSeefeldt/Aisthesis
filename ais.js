@@ -14,7 +14,7 @@ var master = {width: 900,
               mineWidth: 2,
              };
 
-var user = {number: 255,
+var user = {number: 253,
             clicks: 0,
            };
 
@@ -452,11 +452,11 @@ d3.csv(termInfoFileName,
                 .duration(800)
                 .attr("x",
                   function(d,i){
-                    return (termAxis(parseInt(d.rank)+1) * Math.cos(circAxis(d.cluster))) + master.height/2;
+                    return (termAxis(parseInt(d.rank)+1) * Math.cos(circAxis(parseInt(d.cluster)))) + master.height/2;
                   })
                 .attr("y",
                   function(d,i){
-                    return (termAxis(parseInt(d.rank)+1) * Math.sin(circAxis(d.cluster))) + master.height/2;
+                    return (termAxis(parseInt(d.rank)+1) * -Math.sin(circAxis(parseInt(d.cluster)))) + master.height/2;
                   })
                 .style("opacity",
                   function(d){
