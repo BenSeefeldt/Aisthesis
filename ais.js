@@ -2,7 +2,7 @@
 // room for interaction tools.
 var master = {width: 900,
               height: 800,
-              square: 15,
+              square: 10,
               squareGap: 3,
               squareRad: 3,
               ringWidth: 1,
@@ -48,8 +48,8 @@ var svg = d3.select("body")
             ;
 
 //var sentenceInfoFileName = "data/exampleSentenceData.csv";
-var sentenceInfoFileName = "data/draft1SentenceData.csv";
-var termInfoFileName = "data/draft1TermData.csv";
+var sentenceInfoFileName = "data/draft2SentenceData.csv";
+var termInfoFileName = "data/draft2TermData.csv";
 
 d3.csv(sentenceInfoFileName,
   function(data){
@@ -290,7 +290,7 @@ d3.csv(termInfoFileName,
        .data(ringWidth)
        .enter()
        .append("circle")
-       .attr("r", function(d) { return d; })
+       .attr("r", 0)
        .attr("cx", master.height/2)
        .attr("cy", master.height/2)
        .attr("class","rings")
@@ -298,6 +298,13 @@ d3.csv(termInfoFileName,
        .style("stroke-width", master.ringWidth)
        .style("fill", "none")
        ;
+    svg.selectAll(".rings")
+       .data(ringWidth)
+       .transition()
+       .delay(300)
+       .ease("elastic")
+       .duration(5000)
+       .attr("r", function(d) { return d; })
 
     // --------------------------- Draw Words ------------------------------- //
 
@@ -348,11 +355,11 @@ d3.csv(termInfoFileName,
        .attr("ry", master.squareRad)
        .attr("x",
          function(d,i) {
-           return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+           return master.height/2 - master.square/2 + (0*(master.square+master.squareGap));
          })
        .attr("y",
          function(d,i) {
-           return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+           return master.height/2 - master.square/2 + (0*(master.square+master.squareGap));
          })
        .style("fill",
          function(d) {
@@ -388,6 +395,20 @@ d3.csv(termInfoFileName,
            ;
          })
        ;
+    svg.selectAll(".boxes")
+       .transition()
+       .delay(300)
+       .ease("elastic")
+       .duration(5000)
+       .attr("x",
+         function(d,i) {
+           return master.height/2 - master.square/2 + (d.x*(master.square+master.squareGap));
+         })
+       .attr("y",
+         function(d,i) {
+           return master.height/2 - master.square/2 + (d.y*(master.square+master.squareGap));
+         })
+       .style("opacity", 1.0)
 
     // Center point
     svg.append("rect")
